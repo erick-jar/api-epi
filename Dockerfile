@@ -4,12 +4,13 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn -B -DskipTests package
+
 # Fase 2: imagem leve, só com o Java para rodar o .jar
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+
 # Plano gratuito tem 512 MB de RAM: limitamos a memória do Java
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k
--XX:TieredStopAtLevel=1"
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1"
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
